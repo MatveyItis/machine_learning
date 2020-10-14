@@ -33,8 +33,8 @@ def show_clusters(clusters: {}):
     i = 0
     for k in clusters.keys():
         dots = clusters.get(k)
-        x = [k.x]
-        y = [k.y]
+        x = []
+        y = []
         for d in dots:
             x.append(d.x)
             y.append(d.y)
@@ -136,8 +136,9 @@ def re_center(clusters: {}) -> []:
         for cluster_dot in cluster_dots:
             c_x += cluster_dot.x
             c_y += cluster_dot.y
-        c_x = c_x / len(cluster_dots)
-        c_y = c_y / len(cluster_dots)
+        len_cluster_dots = len(cluster_dots)
+        c_x = c_x / len_cluster_dots
+        c_y = c_y / len_cluster_dots
         new_clusters.append(Dot(x=c_x, y=c_y))
     return new_clusters
 
