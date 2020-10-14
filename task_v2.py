@@ -9,16 +9,17 @@ def read_csv(file):
 
 def draw(dataset):
     date = list(dataset.Date)
-    emession = list(dataset['Monthly Mean Total Sunspot Number'])
-    emession_new = []
-    emession_new[0] = emession[0]
-    for i in range(1, len(emession) - 1):
-        emession_new[i] = (emession[i - 1] * i + emession[i]) / (i + 1)
-
-    plt.figure(figsize=[30, 10])
-    plt.plot(date, emession, color='r')
-    plt.scatter(date, emession)
+    series = list(dataset['Monthly Mean Total Sunspot Number'])
+    plt.figure(figsize=[40, 10])
+    plt.plot(date, series)
+    plt.scatter(date, series)
     # plt.xlim(0, 100)
+    plt.xlabel("Months since Jan 1749.")
+    plt.ylabel("No. of Sun spots")
+    n = 25
+    result = pd.DataFrame(series)
+    rolling_mean = result.rolling(window=n).mean()
+    plt.plot(rolling_mean, color='r')
     plt.show()
 
 
