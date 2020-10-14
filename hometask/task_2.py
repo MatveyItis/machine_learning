@@ -24,8 +24,22 @@ def show_dots(dots: []):
     for o in range(0, len(dots)):
         x.append(dots[o].x)
         y.append(dots[o].y)
-
     plt.scatter(x, y)
+    plt.show()
+
+
+def show_clusters(clusters: {}):
+    colors = ["red", "green", "blue", "black", "pink"]
+    i = 0
+    for k in clusters.keys():
+        dots = clusters.get(k)
+        x = [k.x]
+        y = [k.y]
+        for d in dots:
+            x.append(d.x)
+            y.append(d.y)
+        plt.scatter(x, y, color=colors[i])
+        i = i + 1
     plt.show()
 
 
@@ -43,10 +57,10 @@ def generate_dots(size, max_x, max_y):
     return dots
 
 
-def get_centers(dots: [], k: int):
+def get_centers(dots: [], k: int) -> []:
     max_distance = 0
-    c_1: Dot = None
-    c_2: Dot = None
+    c_1 = None
+    c_2 = None
     centers = []
     for i in range(0, len(dots)):
         d_1 = dots[i]
@@ -79,11 +93,60 @@ def get_centers(dots: [], k: int):
                 new_center = dot_from
         centers.append(new_center)
         dots.remove(new_center)
+
     return centers
 
 
-rand_dots = generate_dots(200, 100, 100)
+def create_clusters(dots: [], centers: []):
+    clusters = {}
+    for d in dots:
+        min_distance = 0
+        cluster = None
+        for c in centers:
+            distance = get_distance(d, c)
+            if min_distance == 0 or distance < min_distance:
+                min_distance = distance
+                cluster = c
+                if clusters.get(cluster) is None:
+                    clusters.update({cluster: []})
+        cluster_dots = clusters.get(cluster)
+        cluster_dots.append(d)
+        clusters.update({cluster: cluster_dots})
+    return clusters
+
+
+def get_final_clusters(dots: [], k: int):
+    centers = get_centers(dots.copy(), k)
+    clusters = create_clusters(dots.copy(), centers.copy())
+    new_centers = re_center(clusters)
+    while centers != new_centers:
+        clusters = create_clusters(dots.copy(), new_centers.copy())
+        centers = new_centers
+        new_centers = re_center(clusters)
+    return clusters
+
+
+def re_center(clusters: {}) -> []:
+    centers = clusters.keys()
+    new_clusters = []
+    for c in centers:
+        cluster_dots = clusters.get(c)
+        c_x = 0
+        c_y = 0
+        for cluster_dot in cluster_dots:
+            c_x += cluster_dot.x
+            c_y += cluster_dot.y
+        c_x = c_x / len(cluster_dots)
+        c_y = c_y / len(cluster_dots)
+        new_clusters.append(Dot(x=c_x, y=c_y))
+    return new_clusters
+
+
+rand_dots = generate_dots(150, 100, 100)
 show_dots(rand_dots)
 
-center_dots = get_centers(rand_dots, 3)
-show_dots(center_dots)
+res_clusters = get_final_clusters(rand_dots, 3)
+show_clusters(res_clusters)
+#
+# center_dots = get_centers(rand_dots, 3)
+# show_dots(center_dots)
