@@ -29,7 +29,7 @@ def show_dots(dots: []):
 
 
 def show_clusters(clusters: {}):
-    colors = ["red", "green", "blue", "black", "pink"]
+    colors = ["red", "green", "blue", "black", "pink", "yellow", "gray"]
     i = 0
     for k in clusters.keys():
         dots = clusters.get(k)
@@ -117,13 +117,13 @@ def create_clusters(dots: [], centers: []):
 
 def get_final_clusters(dots: [], k: int):
     centers = get_centers(dots.copy(), k)
-    clusters = create_clusters(dots.copy(), centers.copy())
-    new_centers = re_center(clusters)
+    fin_clusters = create_clusters(dots.copy(), centers.copy())
+    new_centers = re_center(fin_clusters)
     while centers != new_centers:
-        clusters = create_clusters(dots.copy(), new_centers.copy())
+        fin_clusters = create_clusters(dots.copy(), new_centers.copy())
         centers = new_centers
-        new_centers = re_center(clusters)
-    return clusters
+        new_centers = re_center(fin_clusters)
+    return fin_clusters
 
 
 def re_center(clusters: {}) -> []:
@@ -143,10 +143,37 @@ def re_center(clusters: {}) -> []:
     return new_clusters
 
 
+def get_distances(clusters: {}):
+    summ = 0
+    for k in clusters.keys():
+        k_dots = clusters.get(k)
+        for d in k_dots:
+            summ += get_distance(d, k)
+    return summ
+
+
+def get_optimal_clusters(dots: []) -> {}:
+    e = 0.1
+    k = 2
+    summ_distance = 0
+    has_next = True
+    clusters = {}
+    while has_next:
+        clusters = get_final_clusters(dots.copy(), k)
+        curr_distance = get_distances(clusters)
+        diff = (summ_distance - curr_distance) / curr_distance
+        distance_between = diff * diff
+        has_next = distance_between >= e
+        summ_distance = curr_distance
+        if has_next:
+            k += 1
+    return clusters
+
+
 rand_dots = generate_dots(200, 80, 80)
 show_dots(rand_dots)
 
-res_clusters = get_final_clusters(rand_dots, 3)
+res_clusters = get_optimal_clusters(rand_dots)
 show_clusters(res_clusters)
 #
 # center_dots = get_centers(rand_dots, 3)
