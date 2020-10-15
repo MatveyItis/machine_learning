@@ -52,7 +52,7 @@ def get_distance(dot_a: Dot, dot_b: Dot):
 def generate_dots(size, max_x, max_y):
     dots = []
     for j in range(0, size):
-        d = Dot(random.randint(0, max_x), random.randint(0, max_y))
+        d = Dot(random.randint(0, max_x) - random.randint(0, 3), random.randint(0, max_y) + random.randint(0, 3))
         dots.append(d)
     return dots
 
@@ -143,7 +143,7 @@ def re_center(clusters: {}) -> []:
     return new_clusters
 
 
-rand_dots = generate_dots(150, 100, 100)
+rand_dots = generate_dots(200, 80, 80)
 show_dots(rand_dots)
 
 res_clusters = get_final_clusters(rand_dots, 3)
