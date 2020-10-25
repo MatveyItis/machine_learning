@@ -2,20 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-
-class Dot:
-    def __init__(self, x: float, y: float):
-        self.x = x
-        self.y = y
-
-    def __str__(self) -> str:
-        return 'x=' + str(self.x) + ' ' + 'y=' + str(self.y)
-
-    def __eq__(self, o: object) -> bool:
-        return self.x == o.x and self.y == o.y
-
-    def __hash__(self) -> int:
-        return hash(tuple(self.__dict__.values()))
+from hometask.dot import Dot
 
 
 def show_dots(dots: []):
@@ -152,25 +139,36 @@ def get_distances(clusters: {}):
     return summ
 
 
+def calculate_formula_for_the_best_k(distance_keys: [], k: int):
+    return np.math.fabs((distance_keys[k - 1] - distance_keys[k]) / (distance_keys[k - 2] - distance_keys[k - 1]))
+
+
 def get_optimal_clusters(dots: []) -> {}:
-    e = 0.1
+    c = 9
     k = 2
-    summ_distance = 0
+    distance_keys = [None] * c
+    d = [None] * c
+    clusters_keys = [None] * c
+
     has_next = True
-    clusters = {}
     while has_next:
-        clusters = get_final_clusters(dots.copy(), k)
-        curr_distance = get_distances(clusters)
-        diff = (summ_distance - curr_distance) / curr_distance
-        distance_between = diff * diff
-        has_next = distance_between >= e
-        summ_distance = curr_distance
-        if has_next:
-            k += 1
-    return clusters
+        clusters_keys[k] = get_final_clusters(dots.copy(), k)
+        curr_distance = get_distances(clusters_keys[k])
+        distance_keys[k] = curr_distance
+        if k > 3:
+            d[k - 1] = calculate_formula_for_the_best_k(distance_keys, k)
+        k += 1
+        has_next = k < c
+
+    filtered_array = []
+    for i in range(0, c):
+        if d[i] is not None:
+            filtered_array.append(d[i])
+    idx = d.index(min(filtered_array))
+    return clusters_keys[idx]
 
 
-rand_dots = generate_dots(200, 80, 80)
+rand_dots = generate_dots(400, 100, 100)
 show_dots(rand_dots)
 
 res_clusters = get_optimal_clusters(rand_dots)
