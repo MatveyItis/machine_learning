@@ -168,11 +168,12 @@ def get_optimal_clusters(dots: []) -> {}:
     return clusters_keys[idx]
 
 
-rand_dots = generate_dots(400, 100, 100)
-show_dots(rand_dots)
+if __name__ == '__main__':
+    rand_dots = generate_dots(400, 100, 100)
+    show_dots(rand_dots)
+    res_clusters = get_optimal_clusters(rand_dots)
+    show_clusters(res_clusters)
 
-res_clusters = get_optimal_clusters(rand_dots)
-show_clusters(res_clusters)
 #
 # center_dots = get_centers(rand_dots, 3)
 # show_dots(center_dots)
