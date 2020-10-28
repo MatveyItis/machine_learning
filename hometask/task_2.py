@@ -16,7 +16,7 @@ def show_dots(dots: []):
 
 
 def show_clusters(clusters: {}):
-    colors = ["red", "green", "blue", "black", "pink", "yellow", "gray"]
+    colors = ["red", "green", "blue", "black", "pink", "yellow", "gray", "cyan", "magenta"]
     i = 0
     for k in clusters.keys():
         dots = clusters.get(k)
