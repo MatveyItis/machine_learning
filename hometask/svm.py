@@ -13,14 +13,21 @@ def get_color(button_value):
         return GREEN
 
 
+def fx(k, b, x):
+    return (k * x) + b
+
+
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (225, 0, 50)
 GREEN = (0, 225, 0)
 BLUE = (0, 0, 225)
 
+WIDTH = 800
+HEIGHT = 600
+
 pygame.init()
-sc = pygame.display.set_mode((800, 600))
+sc = pygame.display.set_mode((WIDTH, HEIGHT))
 sc.fill(WHITE)
 pygame.display.update()
 
@@ -28,7 +35,7 @@ clock = pygame.time.Clock()
 
 cluster_dots = {}
 control_dots = []
-clf = svm.SVC()
+clf = svm.SVC(kernel='linear', C=1.0)
 
 is_model_ready = False
 play = True
@@ -47,6 +54,7 @@ while play:
                         cluster_dots.update({color: []})
                     arr = cluster_dots.get(color)
                     arr.append([i.pos[0], i.pos[1]])
+                    print([i.pos[0], i.pos[1]])
                     cluster_dots.update({color: arr})
                     pygame.draw.circle(sc, color, i.pos, 10)
                     pygame.display.update()
@@ -75,6 +83,21 @@ while play:
                     x.append(x2[j])
                 print("x array = ", x)
                 clf.fit(x, y)
+                w = clf.coef_[0]
+                L = clf.intercept_
+                n = -w[0] / w[1]
+                m = L[0] / w[1]
+                y11 = -m
+                x11 = m / n
+                y12 = 1 / w[1] - m
+                x22 = 1 / w[0] + m / n
+                y13 = -1 / w[1] - m
+                x23 = -1 / w[0] + m / n
+                pygame.draw.aaline(sc, BLACK, [0, y12], [x22, 0], 1)
+                pygame.draw.aaline(sc, BLACK, [0, y13], [x23, 0], 1)
+                pygame.draw.line(sc, BLACK, [0, y11], [x11, 0], 2)
+                pygame.display.update()
+                print(x11, y11)
                 print("Model has been fitted")
                 is_model_ready = True
             if i.key == 107:
