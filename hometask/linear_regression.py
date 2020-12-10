@@ -1,32 +1,40 @@
-# imports
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 
-def load_data(path, header):
-    marks_df = pd.read_csv(path, header=header)
-    return marks_df
+def generate_simple_dots():
+    return [(np.random.randint(low=0, high=150), np.random.randint(low=0, high=150)) for i in range(100)]
 
 
-if __name__ == "__main__":
-    # load the data from the file
-    data = load_data("../data/marks.txt", None)
-
-    # X = feature values, all the columns except the last column
-    X = data.iloc[:, :-1]
-
-    # y = target values, last column of the data frame
-    y = data.iloc[:, -1]
-
-    # filter out the applicants that got admitted
-    admitted = data.loc[y == 1]
-
-    # filter out the applicants that din't get admission
-    not_admitted = data.loc[y == 0]
-
-    # plots
-    plt.scatter(admitted.iloc[:, 0], admitted.iloc[:, 1], s=10, label='Admitted')
-    plt.scatter(not_admitted.iloc[:, 0], not_admitted.iloc[:, 1], s=10, label='Not Admitted')
-    plt.legend()
+def show_init_dataframe(X, Y):
+    plt.scatter(X, Y)
     plt.show()
+
+
+def show_line(X, Y, y_pred):
+    plt.scatter(X, Y)
+    plt.plot([min(X), max(X)], [min(y_pred), max(y_pred)], color='black')
+    plt.show()
+
+
+if __name__ == '__main__':
+    m = 0
+    c = 0
+    L = 0.0001
+    epochs = 1000
+    gen_dots = generate_simple_dots()
+    frame = pd.DataFrame(gen_dots)
+    X = frame.iloc[:, 0]
+    Y = frame.iloc[:, 1]
+    show_init_dataframe(X, Y)
+    n = float(len(X))
+    for i in range(epochs):
+        y_pred = m * X + c
+        d_m = (-2 / n) * sum(X * (Y - y_pred))
+        d_c = (-2 / n) * sum(Y - y_pred)
+        m = m - L * d_m
+        c = c - L * d_c
+    # Predict
+    y_pred = m * X + c
+    show_line(X, Y, y_pred)
