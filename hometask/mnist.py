@@ -86,8 +86,8 @@ while play:
             play = False
         if i.type == pg.MOUSEBUTTONDOWN:
             if i.button == 3:
-                pg.image.save(sc, 'picture.png')
-                dog_surf = pg.image.load('picture.png')
+                pg.image.save(sc, '../picture.png')
+                dog_surf = pg.image.load('../picture.png')
                 pred = get_prediction()
                 text1 = f1.render('Предсказанная цифра: {0}'.format(pred), True, WHITE)
                 sc.blit(text1, (10, 10))
