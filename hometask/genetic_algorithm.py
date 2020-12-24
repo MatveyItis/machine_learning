@@ -5,18 +5,15 @@ from random import gauss, randrange
 
 
 def individual(number_of_genes, upper_limit, lower_limit):
-    return [round(rnd() * (upper_limit - lower_limit)
-                  + lower_limit, 1) for x in range(number_of_genes)]
+    return [round(rnd() * (upper_limit - lower_limit) + lower_limit, 1) for x in range(number_of_genes)]
 
 
 def population(number_of_individuals, number_of_genes, upper_limit, lower_limit):
-    return [individual(number_of_genes, upper_limit, lower_limit)
-            for x in range(number_of_individuals)]
+    return [individual(number_of_genes, upper_limit, lower_limit) for x in range(number_of_individuals)]
 
 
 def fitness_calculation(individual):
-    fitness_value = sum(individual)
-    return fitness_value
+    return sum(individual)
 
 
 def roulette(cum_sum, chance):
@@ -70,12 +67,12 @@ def pairing(elit, selected, method='Fittest'):
                 parents[x][1] = individuals[randint(0, (len(individuals) - 1))]
     if method == 'Weighted Random':
         normalized_fitness = sorted([fitness[x] / sum(fitness) for x in range(len(individuals) // 2)], reverse=True)
-        cummulitive_sum = np.array(normalized_fitness).cumsum()
+        cumulative_sum = np.array(normalized_fitness).cumsum()
         for x in range(len(individuals) // 2):
-            parents.append([individuals[roulette(cummulitive_sum, rnd())],
-                            individuals[roulette(cummulitive_sum, rnd())]])
+            parents.append([individuals[roulette(cumulative_sum, rnd())],
+                            individuals[roulette(cumulative_sum, rnd())]])
             while parents[x][0] == parents[x][1]:
-                parents[x][1] = individuals[roulette(cummulitive_sum, rnd())]
+                parents[x][1] = individuals[roulette(cumulative_sum, rnd())]
     return parents
 
 
@@ -164,27 +161,31 @@ def first_generation(pop):
 
 
 if __name__ == '__main__':
-    Result_file = 'GA_Results.txt'
+    res_file = 'genetic_result.txt'
     pop = population(20, 8, 1, 0)
     gen = [first_generation(pop)]
     gen_0 = gen[0]['Fitness']
     fitness_avg = np.array([sum(gen_0) / len(gen_0)])
     fitness_max = np.array([max(gen_0)])
-    res = open(Result_file, 'a')
+    res = open(res_file, 'a')
     res.write('\n' + str(gen) + '\n')
     res.close()
     finish = False
     while not finish:
+        # условия прекращения
+        # максимальный фитнес
         if max(fitness_max) > 6:
             break
+        # максимальный средний фитнес
         if max(fitness_avg) > 5:
             break
+        # максимальный аналогичный номер фитнеса
         if fitness_similarity_check(fitness_max, 50):
             break
         gen.append(next_generation(gen[-1], 1, 0))
         gen_1 = gen[-1]['Fitness']
         fitness_avg = np.append(fitness_avg, sum(gen_1) / len(gen_1))
         fitness_max = np.append(fitness_max, max(gen_1))
-        res = open(Result_file, 'a')
+        res = open(res_file, 'a')
         res.write('\n' + str(gen[-1]) + '\n')
         res.close()
