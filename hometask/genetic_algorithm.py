@@ -27,29 +27,27 @@ def selection(generation, method='Fittest Half'):
     generation['Normalized Fitness'] = sorted([generation['Fitness'][x] / sum(generation['Fitness'])
                                                for x in range(len(generation['Fitness']))], reverse=True)
     generation['Cumulative Sum'] = np.array(generation['Normalized Fitness']).cumsum()
+    gen_individuals_len = len(generation['Individuals'])
     if method == 'Roulette Wheel':
         selected = []
-        for x in range(len(generation['Individuals']) // 2):
+        for x in range(gen_individuals_len // 2):
             selected.append(roulette(generation['Cumulative Sum'], rnd()))
             while len(set(selected)) != len(selected):
                 selected[x] = (roulette(generation['Cumulative Sum'], rnd()))
-        selected = {'Individuals': [generation['Individuals'][int(selected[x])]
-                                    for x in range(len(generation['Individuals']) // 2)],
-                    'Fitness': [generation['Fitness'][int(selected[x])]
-                                for x in range(len(generation['Individuals']) // 2)]}
+        selected = {
+            'Individuals': [generation['Individuals'][int(selected[x])] for x in range(gen_individuals_len // 2)],
+            'Fitness': [generation['Fitness'][int(selected[x])] for x in range(gen_individuals_len // 2)]}
     elif method == 'Fittest Half':
         selected_individuals = [generation['Individuals'][-x - 1]
-                                for x in range(int(len(generation['Individuals']) // 2))]
+                                for x in range(int(gen_individuals_len // 2))]
         selected_fitnesses = [generation['Fitness'][-x - 1]
-                              for x in range(int(len(generation['Individuals']) // 2))]
+                              for x in range(int(gen_individuals_len // 2))]
         selected = {'Individuals': selected_individuals, 'Fitness': selected_fitnesses}
     elif method == 'Random':
         selected_individuals = [generation['Individuals'][randint(1, len(generation['Fitness']))]
-                                for x in range(int(len(generation['Individuals']) // 2))]
-        selected_fitnesses = [generation['Fitness'][-x - 1]
-                              for x in range(int(len(generation['Individuals']) // 2))]
-        selected = {'Individuals': selected_individuals,
-                    'Fitness': selected_fitnesses}
+                                for x in range(int(gen_individuals_len // 2))]
+        selected_fitnesses = [generation['Fitness'][-x - 1] for x in range(int(gen_individuals_len // 2))]
+        selected = {'Individuals': selected_individuals, 'Fitness': selected_fitnesses}
     return selected
 
 
@@ -139,6 +137,14 @@ def next_generation(gen, upper_limit, lower_limit):
     return next_gen
 
 
+def first_generation(pop):
+    fitness = [fitness_calculation(pop[x]) for x in range(len(pop))]
+    sorted_fitness = sorted([[pop[x], fitness[x]] for x in range(len(pop))], key=lambda x: x[1])
+    individuals = [sorted_fitness[x][0] for x in range(len(sorted_fitness))]
+    fitness = [sorted_fitness[x][1] for x in range(len(sorted_fitness))]
+    return {'Individuals': individuals, 'Fitness': sorted(fitness)}
+
+
 def fitness_similarity_check(max_fitness, number_of_similarity):
     result = False
     similarity = 0
@@ -150,14 +156,6 @@ def fitness_similarity_check(max_fitness, number_of_similarity):
     if similarity == number_of_similarity - 1:
         result = True
     return result
-
-
-def first_generation(pop):
-    fitness = [fitness_calculation(pop[x]) for x in range(len(pop))]
-    sorted_fitness = sorted([[pop[x], fitness[x]] for x in range(len(pop))], key=lambda x: x[1])
-    individuals = [sorted_fitness[x][0] for x in range(len(sorted_fitness))]
-    fitness = [sorted_fitness[x][1] for x in range(len(sorted_fitness))]
-    return {'Individuals': individuals, 'Fitness': sorted(fitness)}
 
 
 if __name__ == '__main__':
